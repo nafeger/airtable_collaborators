@@ -10,6 +10,10 @@ class Schema:
     """
     This class will check to see if the schema columns are the expected ones.
     In the future this should be used to create the schema if it doesn't exist.
+
+    TODO:
+    [ ] Validate column types
+    [ ] Install the missing columns?
     """
     base_id: str = None
     airtable_api: Api = None
