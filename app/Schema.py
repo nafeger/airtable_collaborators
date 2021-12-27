@@ -12,7 +12,6 @@ class Schema:
     In the future this should be used to create the schema if it doesn't exist.
 
     TODO:
-    [ ] Validate column types
     [ ] Install the missing columns?
     """
     base_id: str = None
@@ -28,21 +27,21 @@ class Schema:
         },
         'Users': {
             'Id': 'singleLineText',
-            'Users-to-base': 'singleLineText',
-            'Workspace Permissions': '',
-            'Workspace Grant Date': '',
-            'Base Permissions': '',
-            'Email': '',
-            'Base Names': '',
+            'Users-to-base': 'multipleRecordLinks',
+            'Workspace Permissions': 'singleSelect',
+            'Workspace Grant Date': 'dateTime',
+            'Base Permissions': 'rollup',
+            'Email': 'email',
+            'Base Names': 'rollup',
         },
         'Users-to-Base': {
-            'User Base': '',
-            'Base': '',
-            'Access Type': '',
-            'User': '',
-            'Update Date': '',
-            'Base Name': '',
-            'User Email': '',
+            'User Base': 'singleLineText',
+            'Base': 'multipleRecordLinks',
+            'Access Type': 'singleSelect',
+            'User': 'multipleRecordLinks',
+            'Update Date': 'lastModifiedTime',
+            'Base Name': 'multipleLookupValues',
+            'User Email': 'multipleLookupValues',
         }
 
     }
@@ -70,7 +69,10 @@ class Schema:
                     if f['name'] not in target_columns:
                         print(f"Unexpected column: {t['name']}({f['name']})")
                         self.exit_code |= -1
-                # print("***")
+                    else:
+                        column_type = f['type']
+                        if column_type != self.schema[t['name']][f['name']]:
+                            print("Found invalid column type: {}({}-<{}>)".format(t['name'], f['name'], column_type))
         return self.exit_code
 
 
