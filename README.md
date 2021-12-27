@@ -7,7 +7,9 @@ Working on the Repo:
 one time:
 ```bash
 python3.7 -m venv venv/
-pip3 install -r requirements.txt
+source venv/bin/activate
+cd app
+pip install -r requirements.txt
 ```
 
 each time:
