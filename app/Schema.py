@@ -18,14 +18,18 @@ class Schema:
     airtable_api: Api = None
     exit_code: int = 0
 
+    BASES_TABLE_NAME: str = "Bases"
+    USERS_TABLE_NAME: str = "Users"
+    USERSTOBASES_TABLE_NAME: str = "Users-to-Bases"
+
     schema: Dict = {
-        'Bases': {
+        BASES_TABLE_NAME: {
             'Id': 'singleLineText',
             'Name': 'singleLineText',
             'Update Date': 'lastModifiedTime',
             'Users-to-base': 'multipleRecordLinks'
         },
-        'Users': {
+        USERS_TABLE_NAME: {
             'Id': 'singleLineText',
             'Users-to-base': 'multipleRecordLinks',
             'Workspace Permissions': 'singleSelect',
@@ -34,7 +38,7 @@ class Schema:
             'Email': 'email',
             'Base Names': 'rollup',
         },
-        'Users-to-Base': {
+        USERSTOBASES_TABLE_NAME: {
             'User Base': 'singleLineText',
             'Base': 'multipleRecordLinks',
             'Access Type': 'singleSelect',
@@ -75,13 +79,3 @@ class Schema:
                             print("Found invalid column type: {}({}-<{}>)".format(t['name'], f['name'], column_type))
         return self.exit_code
 
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-b", "--base_id", help="Airtable Base ID")
-    parser.add_argument("-a", "--airtable_api_key", help="Airtable API Key")
-
-    args = parser.parse_args()
-
-    x = Schema(base_id=args.base_id, airtable_api_key=args.airtable_api_key)
-    exit(x.validate())
