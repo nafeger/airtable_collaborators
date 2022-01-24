@@ -8,6 +8,7 @@ if __name__ == '__main__':
     parser.add_argument("-b", "--base_id", help="Airtable Base ID", required=True)
     parser.add_argument("-a", "--airtable_api_key", help="Airtable API Key", required=True)
     parser.add_argument("-c", "--clear_records", help="Clear Records", action='store_true')
+    parser.add_argument("-w", "--workspace_id", help="Workspace ID", required=True)
 
     args = parser.parse_args()
 
@@ -16,7 +17,7 @@ if __name__ == '__main__':
         print("Error: Schema is not valid")
         exit(1)
 
-    p = Populator(base_id=args.base_id, airtable_api_key=args.airtable_api_key)
+    p = Populator(base_id=args.base_id, airtable_api_key=args.airtable_api_key, workspace_id=args.workspace_id)
     if args.clear_records:
         exit(p.clear())
 
