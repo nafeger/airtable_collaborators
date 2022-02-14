@@ -20,6 +20,8 @@ class Populator:
         self.airtable_api = Api(api_key=airtable_api_key)
         self.base_table = Table(api_key=airtable_api_key, base_id=self.base_id, table_name=Schema.BASES_TABLE_NAME)
         self.users_table = Table(api_key=airtable_api_key, base_id=self.base_id, table_name=Schema.USERS_TABLE_NAME)
+        self.users_to_base_table = Table(api_key=airtable_api_key, base_id=self.base_id,
+                                         table_name=Schema.USERSTOBASES_TABLE_NAME)
         self.workspace_id = workspace_id
 
         if not self.workspace_id:
@@ -33,18 +35,20 @@ class Populator:
             data[column_name] = column_value
             table.create(fields=data)
 
-    def load_bases(self):
+    def populate_bases(self):
         bases = get_api_bases(self.airtable_api)
         for b in bases['bases']:
-            id = b['id']
-            name = b['name']
-            self.upsert(table=self.base_table, column_name='Id', column_value=id, data={'Name': name})
+            base_id = b['id']
+            base_name = b['name']
+            self.upsert(table=self.base_table, column_name='Id', column_value=base_id, data={'Name': base_name})
 
     def populate(self):
-        # bases = self.load_bases()
+        self.populate_bases()
 
         e = self.workspaces(workspace_id=self.workspace_id)
         self.populate_workspace_collaborators(collaborators=e['collaborators']['workspaceCollaborators'])
+
+        self.populate_base_collaborators(base_collaborators=e['collaborators']['baseCollaborators'])
 
         # TODO finish this method.
         return -1
@@ -55,9 +59,6 @@ class Populator:
             records = self.base_table.all(max_records=1000)
             ids = [d['id'] for d in records]
             self.base_table.batch_delete(ids)
-
-    def load_users(self):
-        pass
 
     def workspaces(self, workspace_id):
         base_schema_url = posixpath.join(
@@ -74,3 +75,28 @@ class Populator:
                                                                                               'Workspace Permissions': permission_level,
                                                                                               'Workspace Grant Date': u[
                                                                                                   'createdTime']})
+
+    def populate_base_collaborators(self, base_collaborators: List):
+        for u in base_collaborators:
+            user_id = u['userId']
+            email = u['email']
+            self.upsert(table=self.users_table, column_name='Id', column_value=user_id, data={'Email': email})
+
+            base_id = u['baseId']
+            base = self.base_table.first(formula=match({'Id': base_id}))
+            if base is None:
+                print(f"Unable to find base: {base_id}")
+            base_record_key = base['id']
+            user = self.users_table.first(formula=match({'Id': user_id}))
+            if user is None:
+                print(f"Unable to find user: {user_id}")
+            user_record_key = user['id']
+            permission_level = u['permissionLevel']
+            user_base = f"{user_id}-{base_id}"
+            self.upsert(table=self.users_to_base_table,
+                        column_name='User Base',
+                        column_value=user_base,
+                        data={'Base': [base_record_key],
+                              'User': [user_record_key],
+                              'Access Type': permission_level
+                              })
