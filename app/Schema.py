@@ -46,6 +46,7 @@ class Schema:
             'Update Date': 'lastModifiedTime',
             'Base Name': 'multipleLookupValues',
             'User Email': 'multipleLookupValues',
+            'Permission Description': '<formula>'
         }
 
     }
