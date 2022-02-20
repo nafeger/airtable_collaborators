@@ -1,5 +1,12 @@
-This project will query the airtable API and build out an airtable base with the users accessing your system.
+If you have an enterprise airtable account and struggle with how to identify who has access to what, this project is for you.
 
+First grab this base: https://airtable.com/shrvrts2Ehkv9Ad4m and make a copy of it. Download the code in the repo and setup the venv as shown below.
+
+Then simply run the command: 
+```bash
+python3 Runner.py -a [airtable api key] -b [base id] -w [workspace id]
+```
+It'll take a minute or so, but you'll then be able to visually inspect the bases, the workspace collaborators and base collaaborators as well as their permissions within the airtable bases we all know and love.
 
 
 Working on the Repo:
@@ -14,7 +21,6 @@ pip install -r requirements.txt
 
 each time:
 ```bash
-nvm use v8.11.3
 source venv/bin/activate
 ```
 
